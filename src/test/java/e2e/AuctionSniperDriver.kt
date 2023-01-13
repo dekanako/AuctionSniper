@@ -3,11 +3,13 @@ package e2e
 import com.objogate.wl.swing.AWTEventQueueProber
 import com.objogate.wl.swing.driver.JFrameDriver
 import com.objogate.wl.swing.driver.JTableDriver
+import com.objogate.wl.swing.driver.JTableHeaderDriver
 import com.objogate.wl.swing.gesture.GesturePerformer
 import com.objogate.wl.swing.matcher.IterableComponentsMatcher
+import com.objogate.wl.swing.matcher.IterableComponentsMatcher.matching
 import com.objogate.wl.swing.matcher.JLabelTextMatcher.withLabelText
 import io.github.dekanako.ui.MAIN_WINDOW_NAME
-import org.hamcrest.CoreMatchers.equalTo
+import javax.swing.table.JTableHeader
 
 class AuctionSniperDriver(timeout: Int) : JFrameDriver(
     GesturePerformer(),
@@ -17,9 +19,18 @@ class AuctionSniperDriver(timeout: Int) : JFrameDriver(
 ) {
     fun showsSniperStatus(itemId: String, lastPrice: Int, lastBid: Int, statusText: String) {
         JTableDriver(this).hasRow(
-            IterableComponentsMatcher.matching(
+            matching(
                 withLabelText(itemId), withLabelText(lastPrice.toString()),
                 withLabelText(lastBid.toString()), withLabelText(statusText)
+            )
+        )
+    }
+
+    fun hasColumnTitles() {
+        val headers = JTableHeaderDriver(this, JTableHeader::class.java)
+        headers.hasHeaders(
+            matching(
+                withLabelText("Item"), withLabelText("Last Price"), withLabelText("Last Bid"), withLabelText("State")
             )
         )
     }

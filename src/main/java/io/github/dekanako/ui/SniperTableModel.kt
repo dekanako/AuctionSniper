@@ -9,7 +9,9 @@ class SniperTableModel : AbstractTableModel() {
     override fun getRowCount() = 1
 
     override fun getColumnCount() = MainWindow.Column.values().size
-
+    override fun getColumnName(column: Int): String {
+        return MainWindow.Column.at(column).displayName
+    }
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any {
         return MainWindow.Column.at(columnIndex).valueIn(snapshot)
     }

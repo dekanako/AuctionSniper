@@ -1,10 +1,9 @@
 package e2e
 
-import io.github.dekanako.Main
-import io.github.dekanako.domain.AuctionSniper
 import io.github.dekanako.domain.AuctionSniper.SniperSnapshot.SniperStatus.*
 import io.github.dekanako.main
-import io.github.dekanako.ui.SniperTableModel
+import io.github.dekanako.ui.APPLICATION_TITLE
+import io.github.dekanako.ui.MAIN_WINDOW_NAME
 import io.github.dekanako.ui.SniperTableModel.Companion.textFor
 import kotlin.concurrent.thread
 
@@ -16,6 +15,8 @@ class ApplicationRunner {
             main(arrayOf(HOST_NAME, "5224", "sniper", "sniper", auctionServer.itemID))
         }
         itemId = auctionServer.itemID
+        driver.hasTitle(APPLICATION_TITLE)
+        driver.hasColumnTitles()
         driver.showsSniperStatus("",0,0, textFor(JOINING))
     }
 

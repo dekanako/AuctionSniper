@@ -11,7 +11,9 @@ import javax.swing.JTable
 const val MAIN_WINDOW_NAME: String = "main window"
 const val SNIPERS_TABLE_NAME = "snipers table"
 
-class MainWindow(private val snipers: SniperTableModel) : JFrame("Auction Sniper") {
+const val APPLICATION_TITLE = "Auction Sniper"
+
+class MainWindow(private val snipers: SniperTableModel) : JFrame(APPLICATION_TITLE) {
 
     init {
         name = MAIN_WINDOW_NAME
@@ -32,21 +34,19 @@ class MainWindow(private val snipers: SniperTableModel) : JFrame("Auction Sniper
         name = SNIPERS_TABLE_NAME
     }
 
-    enum class Column {
-        ITEM_IDENTIFIER {
+    enum class Column(val displayName: String){
+
+        ITEM_IDENTIFIER("Item") {
             override fun valueIn(snapshot: AuctionSniper.SniperSnapshot) = snapshot.itemId
         },
-        LAST_PRICE {
+        LAST_PRICE("Last Price") {
             override fun valueIn(snapshot: AuctionSniper.SniperSnapshot) = snapshot.price.toString()
         },
-        LAST_BID {
+        LAST_BID("Last Bid") {
             override fun valueIn(snapshot: AuctionSniper.SniperSnapshot) = snapshot.bid.toString()
         },
-        SNIPER_STATUS {
-            override fun valueIn(snapshot: AuctionSniper.SniperSnapshot): String {
-                val textFor = textFor(snapshot.state)
-                return textFor
-            }
+        SNIPER_STATUS("State") {
+            override fun valueIn(snapshot: AuctionSniper.SniperSnapshot): String = textFor(snapshot.state)
         };
 
         abstract fun valueIn(snapshot: AuctionSniper.SniperSnapshot): String

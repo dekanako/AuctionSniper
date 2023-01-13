@@ -13,6 +13,7 @@ import javax.swing.event.TableModelListener
 class SniperTableModelTest {
     private val tableModelListener = mockk<TableModelListener>(relaxed = true)
     private val model = SniperTableModel()
+
     @BeforeEach
     fun setup() {
         model.addTableModelListener(tableModelListener)
@@ -32,6 +33,14 @@ class SniperTableModelTest {
         assertColumnEquals("200", Column.LAST_BID)
         assertColumnEquals("BIDDING", Column.SNIPER_STATUS)
     }
+
+    @Test
+    fun setsUpColumnHeading() {
+        Column.values().forEach {
+            Assertions.assertEquals(model.getColumnName(it.ordinal), it.displayName)
+        }
+    }
+
 
     private fun assertColumnEquals(itemId: Any, column: Column) {
         val row = 0
