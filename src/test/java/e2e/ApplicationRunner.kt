@@ -1,37 +1,42 @@
 package e2e
 
 import io.github.dekanako.Main
+import io.github.dekanako.domain.AuctionSniper
+import io.github.dekanako.domain.AuctionSniper.SniperSnapshot.SniperStatus.*
 import io.github.dekanako.main
+import io.github.dekanako.ui.SniperTableModel
+import io.github.dekanako.ui.SniperTableModel.Companion.textFor
 import kotlin.concurrent.thread
 
 class ApplicationRunner {
     private val driver = AuctionSniperDriver(1000)
-
+    private lateinit var itemId: String
     fun startBiddingIn(auctionServer: FakeAuctionServer) {
         thread(isDaemon = true, name = "Test Application") {
             main(arrayOf(HOST_NAME, "5224", "sniper", "sniper", auctionServer.itemID))
         }
-        driver.showsSniperStatus(Main.STATUS_JOINING)
+        itemId = auctionServer.itemID
+        driver.showsSniperStatus("",0,0, textFor(JOINING))
     }
 
-    fun showsSniperHasLostAuction() {
-        driver.showsSniperStatus(Main.STATUS_LOST)
+    fun showsSniperHasLostAuction(lastPrice: Int, bid: Int) {
+        driver.showsSniperStatus(itemId, lastPrice, bid, textFor(LOST))
     }
 
-    fun hasShownSniperIsBidding() {
-        driver.showsSniperStatus(Main.STATUS_BIDDING)
+    fun hasShownSniperIsBidding(lastPrice: Int, lastBid: Int) {
+        driver.showsSniperStatus(itemId, lastPrice, lastBid, textFor(BIDDING))
+    }
+
+    fun hasShownSniperIsWinning(winningBid: Int) {
+        driver.showsSniperStatus(itemId, winningBid, winningBid, textFor(WINNING))
+    }
+
+    fun showsSniperHasWonAuction(lastPrice: Int) {
+        driver.showsSniperStatus(itemId, lastPrice, lastPrice, textFor(WON))
     }
 
     fun stop() {
         driver.dispose()
-    }
-
-    fun hasShownSniperIsWinning() {
-        driver.showsSniperStatus(Main.STATUS_WINNING)
-    }
-
-    fun showsSniperHasWonAuction() {
-        driver.showsSniperStatus(Main.STATUS_WON)
     }
 
     companion object {

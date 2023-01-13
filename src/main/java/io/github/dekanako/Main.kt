@@ -1,9 +1,8 @@
 package io.github.dekanako
 
-import io.github.dekanako.UI.MainWindow
-import io.github.dekanako.domain.Auction
-import io.github.dekanako.domain.AuctionSniper
-import io.github.dekanako.domain.SniperListener
+import io.github.dekanako.domain.*
+import io.github.dekanako.domain.AuctionSniper.SniperSnapshot
+import io.github.dekanako.ui.MainWindow
 import io.github.dekanako.infraRemote.AuctionMessageTranslator
 import io.github.dekanako.infraRemote.XMPPAuction
 import org.jivesoftware.smack.Chat
@@ -34,7 +33,13 @@ class Main {
         chat = connection.chatManager.createChat(auctionId(itemId, connection.serviceName),null)
 
         val auction: Auction = XMPPAuction(chat)
-        chat.addMessageListener(AuctionMessageTranslator(connection.user, AuctionSniper(auction, SniperStateDisplayer())))
+        chat.addMessageListener(
+            AuctionMessageTranslator(
+                connection.user, AuctionSniper(
+                    itemId, auction, SniperStateDisplayer()
+                )
+            )
+        )
         auction.join()
     }
 
@@ -47,36 +52,11 @@ class Main {
         })
     }
 
-    companion object {
-        const val STATUS_BIDDING = "BIDDING"
-        const val STATUS_JOINING = "JOIN"
-        const val STATUS_LOST = "LOST"
-        const val STATUS_WINNING = "WINNING"
-        const val STATUS_WON = "WON"
-    }
-
     private inner class SniperStateDisplayer : SniperListener {
-        override fun sniperBidding() {
-            showStatus(STATUS_BIDDING)
-        }
-
-        override fun sniperWinning() {
-            showStatus(STATUS_WINNING)
-        }
-
-        override fun sniperWon() {
-            showStatus(STATUS_WON)
-        }
-
-        override fun sniperLost() {
-            showStatus(STATUS_LOST)
-        }
-
-        private fun showStatus(status: String) {
+        override fun sniperStateChanged(sniperSnapshot: SniperSnapshot) {
             SwingUtilities.invokeLater {
-                ui.showStatus(status)
+                ui.sniperStatusChanged(sniperSnapshot)
             }
         }
-
     }
 }

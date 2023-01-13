@@ -17,7 +17,6 @@ class AuctionMessageTranslator(private val sniperId: String, private val eventLi
 
     override fun processMessage(chat: Chat?, message: Message?) {
         val event = AuctionEvent(message)
-
         when (event.type()) {
             "CLOSE" -> eventListener.closed()
             "PRICE" -> eventListener.currentPrice(event.currentPrice(), event.increment(), event.isFrom(sniperId))
@@ -51,9 +50,8 @@ private class AuctionEvent(message: Message?) {
 
         private fun extractFields(message: Message?): List<String> {
             val body = message?.body
-            val fields = body?.split(';').orEmpty().toMutableList().apply { removeLast() }
 
-            return fields
+            return body?.split(';').orEmpty().toMutableList().apply { removeLast() }
         }
     }
 }
