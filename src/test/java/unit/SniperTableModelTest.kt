@@ -28,8 +28,8 @@ class SniperTableModelTest {
         model.sniperStatusChanged(SniperSnapshot(ITEM_ID, 100, 200, BIDDING))
 
         assertColumnEquals(ITEM_ID, Column.ITEM_IDENTIFIER)
-        assertColumnEquals(100, Column.LAST_PRICE)
-        assertColumnEquals(200, Column.LAST_BID)
+        assertColumnEquals("100", Column.LAST_PRICE)
+        assertColumnEquals("200", Column.LAST_BID)
         assertColumnEquals("BIDDING", Column.SNIPER_STATUS)
     }
 

@@ -5,6 +5,7 @@ import io.github.dekanako.domain.AuctionSniper.SniperSnapshot
 import io.github.dekanako.ui.MainWindow
 import io.github.dekanako.infraRemote.AuctionMessageTranslator
 import io.github.dekanako.infraRemote.XMPPAuction
+import io.github.dekanako.ui.SniperTableModel
 import org.jivesoftware.smack.Chat
 import org.jivesoftware.smack.XMPPConnection
 import java.awt.event.WindowAdapter
@@ -13,6 +14,7 @@ import javax.swing.SwingUtilities
 
 class Main {
     private lateinit var ui: MainWindow
+    private val snipers = SniperTableModel()
 
     @Suppress("Not to be GCD")
     private lateinit var chat: Chat
@@ -23,7 +25,7 @@ class Main {
 
     private fun startUserInterface() {
         SwingUtilities.invokeAndWait {
-            ui = MainWindow()
+            ui = MainWindow(snipers)
         }
     }
 
@@ -36,7 +38,7 @@ class Main {
         chat.addMessageListener(
             AuctionMessageTranslator(
                 connection.user, AuctionSniper(
-                    itemId, auction, SniperStateDisplayer()
+                    itemId, auction, SwingThreadSniperListener()
                 )
             )
         )
@@ -52,10 +54,10 @@ class Main {
         })
     }
 
-    private inner class SniperStateDisplayer : SniperListener {
+    private inner class SwingThreadSniperListener : SniperListener {
         override fun sniperStateChanged(sniperSnapshot: SniperSnapshot) {
             SwingUtilities.invokeLater {
-                ui.sniperStatusChanged(sniperSnapshot)
+                snipers.sniperStatusChanged(sniperSnapshot)
             }
         }
     }
