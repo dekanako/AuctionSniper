@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+  openfire:
+    image: nasqueron/openfire
+    ports:
+      - "9091:9090"
+      - "5224:5222"
+      - "7778:7778"
+    volumes:
+    - openfire-data:/var/lib/openfire
+
+volumes:
+  openfire-data:
