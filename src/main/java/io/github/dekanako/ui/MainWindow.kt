@@ -34,7 +34,7 @@ class MainWindow(private val snipers: SniperTableModel) : JFrame(APPLICATION_TIT
         name = SNIPERS_TABLE_NAME
     }
 
-    enum class Column(val displayName: String){
+    enum class Column(val displayName: String) {
 
         ITEM_IDENTIFIER("Item") {
             override fun valueIn(snapshot: AuctionSniper.SniperSnapshot) = snapshot.itemId

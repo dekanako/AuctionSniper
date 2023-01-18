@@ -4,12 +4,12 @@ import io.github.dekanako.MainRun
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Matcher
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers
 import org.jivesoftware.smack.Chat
 import org.jivesoftware.smack.ConnectionConfiguration
 import org.jivesoftware.smack.MessageListener
 import org.jivesoftware.smack.XMPPConnection
 import org.jivesoftware.smack.packet.Message
-import org.junit.jupiter.api.Assertions
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.TimeUnit.SECONDS
 
@@ -63,8 +63,7 @@ class FakeAuctionServer(val itemID: String) {
 
         fun receivesAMessageMatching(matcher: Matcher<String>) {
             val message = messageQueue.poll(5, SECONDS)
-            Assertions.assertNotNull(message)
-            assertThat(message.body, matcher)
+            assertThat(message, Matchers.hasProperty("body", matcher))
         }
 
         override fun processMessage(chat: Chat?, message: Message?) {
