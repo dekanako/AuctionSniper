@@ -17,7 +17,7 @@ class Main {
     private val snipers = SniperTableModel()
 
     @Suppress("Not to be GCD")
-    private lateinit var chat: Chat
+    private var notToBeGCD: MutableList<Chat> = mutableListOf()
 
     init {
         startUserInterface()
@@ -30,19 +30,21 @@ class Main {
     }
 
     fun joinAuction(connection: XMPPConnection, itemId: String) {
+        safelyAddItemToModel(itemId)
         disconnectWhenUIClose(connection)
-
-        chat = connection.chatManager.createChat(auctionId(itemId, connection.serviceName),null)
-
+        val chat = connection.chatManager.createChat(auctionId(itemId, connection.serviceName),null)
+        notToBeGCD.add(chat)
         val auction: Auction = XMPPAuction(chat)
         chat.addMessageListener(
-            AuctionMessageTranslator(
-                connection.user, AuctionSniper(
-                    itemId, auction, SwingThreadSniperListener()
-                )
-            )
+            AuctionMessageTranslator(connection.user, AuctionSniper(itemId, auction, SwingThreadSniperListener()))
         )
         auction.join()
+    }
+
+    private fun safelyAddItemToModel(itemId: String) {
+        SwingUtilities.invokeLater {
+            snipers.addSniper(SniperSnapshot.joining(itemId))
+        }
     }
 
 

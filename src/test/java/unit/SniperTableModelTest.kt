@@ -1,7 +1,9 @@
 package unit
 
+import io.github.dekanako.FoolishError
 import io.github.dekanako.domain.AuctionSniper.SniperSnapshot
 import io.github.dekanako.domain.AuctionSniper.SniperSnapshot.SniperStatus.BIDDING
+import io.github.dekanako.domain.AuctionSniper.SniperSnapshot.SniperStatus.JOINING
 import io.github.dekanako.ui.MainWindow.Column
 import io.github.dekanako.ui.SniperTableModel
 import io.mockk.mockk
@@ -26,6 +28,7 @@ class SniperTableModelTest {
 
     @Test
     fun setSniperValuesInColumns() {
+        model.addSniper(SniperSnapshot(ITEM_ID, 0, 0, JOINING))
         model.sniperStatusChanged(SniperSnapshot(ITEM_ID, 100, 200, BIDDING))
 
         assertColumnEquals(ITEM_ID, Column.ITEM_IDENTIFIER)
@@ -41,6 +44,60 @@ class SniperTableModelTest {
         }
     }
 
+    @Test
+    fun notifiesListenerWhenAddingASniper() {
+        val snapshot = SniperSnapshot.joining("123")
+
+        model.addSniper(snapshot)
+
+        Assertions.assertEquals(1, model.rowCount)
+        assertRowMatchingSnapshot(0, snapshot)
+    }
+
+    @Test
+    fun holdsSniperInAdditionOrder() {
+        val snapshot = SniperSnapshot.joining("item 0")
+        val snapshot2 = SniperSnapshot.joining("item 1")
+
+        model.addSniper(snapshot)
+        model.addSniper(snapshot2)
+
+        Assertions.assertEquals("item 0", cellValue(0, Column.ITEM_IDENTIFIER))
+        Assertions.assertEquals("item 1", cellValue(1, Column.ITEM_IDENTIFIER))
+    }
+
+    @Test
+    fun updateCorrectRowForSniper() {
+        val snapshot = SniperSnapshot.joining("item 0")
+        val snapshot2 = SniperSnapshot.joining("item 1")
+        val expectedSnapshotUpdate = snapshot2.copy(price = 100, bid = 100, state = BIDDING)
+
+        model.addSniper(snapshot)
+        model.addSniper(snapshot2)
+        model.sniperStatusChanged(expectedSnapshotUpdate)
+
+        assertRowMatchingSnapshot(1, expectedSnapshotUpdate)
+    }
+
+    @Test
+    fun throwsDefectWhenNoExistingSniperForAnUpdated() {
+        val snapshot = SniperSnapshot.joining("item 0")
+        val notExistingSniper = SniperSnapshot.joining("item 432")
+
+        model.addSniper(snapshot)
+
+        Assertions.assertThrows(FoolishError::class.java) {
+            model.sniperStatusChanged(notExistingSniper)
+        }
+    }
+    private fun cellValue(row: Int, column: Column) = model.getValueAt(row, column.ordinal)
+
+    private fun assertRowMatchingSnapshot(row: Int, snapshot: SniperSnapshot) {
+        Column.values().forEach {
+            val value = model.getValueAt(row, it.ordinal)
+            Assertions.assertEquals(value, it.valueIn(snapshot))
+        }
+    }
 
     private fun assertColumnEquals(itemId: Any, column: Column) {
         val row = 0

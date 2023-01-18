@@ -3,37 +3,51 @@ package e2e
 import io.github.dekanako.domain.AuctionSniper.SniperSnapshot.SniperStatus.*
 import io.github.dekanako.main
 import io.github.dekanako.ui.APPLICATION_TITLE
-import io.github.dekanako.ui.MAIN_WINDOW_NAME
 import io.github.dekanako.ui.SniperTableModel.Companion.textFor
 import kotlin.concurrent.thread
 
 class ApplicationRunner {
     private val driver = AuctionSniperDriver(1000)
-    private lateinit var itemId: String
-    fun startBiddingIn(auctionServer: FakeAuctionServer) {
+    fun startBiddingIn(vararg auctions: FakeAuctionServer) {
         thread(isDaemon = true, name = "Test Application") {
-            main(arrayOf(HOST_NAME, "5224", "sniper", "sniper", auctionServer.itemID))
+            main(args = arguments(auctions))
         }
-        itemId = auctionServer.itemID
+        assertBasicWindow(auctions)
+    }
+
+    private fun assertBasicWindow(auctions: Array<out FakeAuctionServer>) {
         driver.hasTitle(APPLICATION_TITLE)
         driver.hasColumnTitles()
-        driver.showsSniperStatus("",0,0, textFor(JOINING))
+        driver.showsSniperJoiningAuctions(auctions)
     }
 
-    fun showsSniperHasLostAuction(lastPrice: Int, bid: Int) {
-        driver.showsSniperStatus(itemId, lastPrice, bid, textFor(LOST))
+    private fun arguments(auctions: Array<out FakeAuctionServer>): Array<String> {
+        val args = mutableListOf<String>()
+        args.add(HOST_NAME)
+        args.add("5224")
+        args.add("sniper")
+        args.add("sniper")
+        auctions.forEach {
+            args.add(it.itemID)
+        }
+        return args.toTypedArray()
     }
 
-    fun hasShownSniperIsBidding(lastPrice: Int, lastBid: Int) {
-        driver.showsSniperStatus(itemId, lastPrice, lastBid, textFor(BIDDING))
+    fun showsSniperHasLostAuction(auction: FakeAuctionServer, lastPrice: Int, bid: Int) {
+        driver.showsSniperStatus(auction.itemID, lastPrice, bid, textFor(LOST))
     }
 
-    fun hasShownSniperIsWinning(winningBid: Int) {
-        driver.showsSniperStatus(itemId, winningBid, winningBid, textFor(WINNING))
+    fun hasShownSniperIsBidding(auction: FakeAuctionServer, lastPrice: Int, lastBid: Int) {
+
+        driver.showsSniperStatus(auction.itemID, lastPrice, lastBid, textFor(BIDDING))
     }
 
-    fun showsSniperHasWonAuction(lastPrice: Int) {
-        driver.showsSniperStatus(itemId, lastPrice, lastPrice, textFor(WON))
+    fun hasShownSniperIsWinning(auction: FakeAuctionServer, winningBid: Int) {
+        driver.showsSniperStatus(auction.itemID, winningBid, winningBid, textFor(WINNING))
+    }
+
+    fun showsSniperHasWonAuction(auction: FakeAuctionServer, lastPrice: Int) {
+        driver.showsSniperStatus(auction.itemID, lastPrice, lastPrice, textFor(WON))
     }
 
     fun stop() {

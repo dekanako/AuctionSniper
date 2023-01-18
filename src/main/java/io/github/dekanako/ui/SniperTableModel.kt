@@ -1,33 +1,48 @@
 package io.github.dekanako.ui
 
-import io.github.dekanako.domain.AuctionSniper
+import io.github.dekanako.FoolishError
+import io.github.dekanako.domain.AuctionSniper.SniperSnapshot
 import javax.swing.table.AbstractTableModel
 
 class SniperTableModel : AbstractTableModel() {
-    private val STARTING_UP = AuctionSniper.SniperSnapshot("", 0, 0, AuctionSniper.SniperSnapshot.SniperStatus.JOINING)
-    private var snapshot: AuctionSniper.SniperSnapshot = STARTING_UP
-    override fun getRowCount() = 1
+    private var snapshot: MutableList<SniperSnapshot> = mutableListOf()
+    override fun getRowCount(): Int {
+        return snapshot.size
+    }
 
     override fun getColumnCount() = MainWindow.Column.values().size
     override fun getColumnName(column: Int): String {
         return MainWindow.Column.at(column).displayName
     }
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any {
-        return MainWindow.Column.at(columnIndex).valueIn(snapshot)
+        return if (snapshot.isEmpty()) ""
+        else
+            MainWindow.Column.at(columnIndex).valueIn(snapshot[rowIndex])
     }
 
-    fun sniperStatusChanged(sniperSnapshot: AuctionSniper.SniperSnapshot) {
-        this.snapshot = sniperSnapshot
-        fireTableRowsUpdated(0, 0)
+    fun sniperStatusChanged(sniperSnapshot: SniperSnapshot) {
+        val index = snapshot.indexOfFirst { it.isForSameItemAs(sniperSnapshot) }
+        throwIfItemWasntAddedBefore(index, sniperSnapshot)
+        snapshot[index] = sniperSnapshot
+        fireTableRowsUpdated(index, index + 1)
+    }
+
+    private fun throwIfItemWasntAddedBefore(index: Int, sniperSnapshot: SniperSnapshot) {
+        if (index == -1) throw FoolishError("$sniperSnapshot Should be added before updating it")
+    }
+
+    fun addSniper(newSnapshot: SniperSnapshot) {
+        snapshot.add(newSnapshot)
+        fireTableRowsInserted(snapshot.lastIndex - 1, snapshot.lastIndex)
     }
 
     companion object {
-        fun textFor(state: AuctionSniper.SniperSnapshot.SniperStatus): String {
+        fun textFor(state: SniperSnapshot.SniperStatus): String {
             return STATUS_TEXTS[state.ordinal]
         }
 
         private val STATUS_TEXTS =
-            arrayOf("JOIN", "BIDDING", "WINNING", "LOST", "WON")
+            arrayOf("JOINING", "BIDDING", "WINNING", "LOST", "WON")
     }
 
 }

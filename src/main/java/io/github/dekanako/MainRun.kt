@@ -14,20 +14,24 @@ val ITEM_ID_AS_LOGIN = "auction-%s"
 val AUCTION_ID_FORMAT = "$ITEM_ID_AS_LOGIN@%s/$AUCTION_RESOURCE"
 object MainRun {
 
-    const val JOIN_COMMAND_FORMAT: String = ""
+    const val JOIN_COMMAND_FORMAT: String = "SOLVersion: 1.1; Command: JOIN;"
     const val BID_FORMAT = "SOLVersion: 1.1; EVENT: BID; PRICE: %s;"
 }
 fun main(args: Array<String>) {
     val main = Main()
-    main.joinAuction(
-        connection(args[ARG_HOST_NAME], args[ARG_PORT], args[ARG_USER_NAME], args[ARG_PASSWORD]),
-        args[ARG_ITEM_ID]
-    )
+    val connection = connection(args[ARG_HOST_NAME], args[ARG_PORT], args[ARG_USER_NAME], args[ARG_PASSWORD])
+    (ARG_ITEM_ID..args.lastIndex).forEach {
+        main.joinAuction(connection, args[it])
+    }
 }
 
 private fun connection(hostname: String, port: String, userName: String, password: String): XMPPConnection {
-    return XMPPConnection(ConnectionConfiguration(hostname, port.toInt())).apply {
+    val connectionConfiguration = ConnectionConfiguration(hostname, port.toInt()).apply {
+    }
+    return XMPPConnection(connectionConfiguration).apply {
+
         connect()
+
         login(userName, password, AUCTION_RESOURCE)
     }
 }

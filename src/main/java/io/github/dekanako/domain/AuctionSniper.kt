@@ -43,6 +43,8 @@ class AuctionSniper(
             return SniperSnapshot(itemId, price, bid, BIDDING)
         }
 
+        fun isForSameItemAs(sniperSnapshot: SniperSnapshot): Boolean = itemId == sniperSnapshot.itemId
+
         enum class SniperStatus {
             JOINING,
             BIDDING,
