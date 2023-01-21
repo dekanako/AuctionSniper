@@ -18,9 +18,9 @@ dependencies {
     implementation 'org.igniterealtime.smack:smack:3.1.0'
     implementation 'org.igniterealtime.smack:smackx:3.1.0'
     testImplementation 'org.hamcrest:hamcrest-all:1.1'
+    testImplementation 'com.googlecode.windowlicker:windowlicker-core:r268'
 
     testImplementation "com.googlecode.windowlicker:windowlicker-swing:r268"
-
 }
 
 test {

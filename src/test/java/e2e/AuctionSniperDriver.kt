@@ -1,15 +1,17 @@
 package e2e
 
 import com.objogate.wl.swing.AWTEventQueueProber
+import com.objogate.wl.swing.driver.JButtonDriver
 import com.objogate.wl.swing.driver.JFrameDriver
 import com.objogate.wl.swing.driver.JTableDriver
 import com.objogate.wl.swing.driver.JTableHeaderDriver
+import com.objogate.wl.swing.driver.JTextFieldDriver
 import com.objogate.wl.swing.gesture.GesturePerformer
 import com.objogate.wl.swing.matcher.IterableComponentsMatcher.matching
 import com.objogate.wl.swing.matcher.JLabelTextMatcher.withLabelText
-import io.github.dekanako.domain.AuctionSniper
-import io.github.dekanako.ui.MAIN_WINDOW_NAME
-import io.github.dekanako.ui.SniperTableModel
+import io.github.dekanako.ui.*
+import javax.swing.JButton
+import javax.swing.JTextField
 import javax.swing.table.JTableHeader
 
 class AuctionSniperDriver(timeout: Int) : JFrameDriver(
@@ -36,12 +38,28 @@ class AuctionSniperDriver(timeout: Int) : JFrameDriver(
         )
     }
 
-    fun showsSniperJoiningAuctions(auctions: Array<out FakeAuctionServer>) {
-        auctions.forEach {
-            showsSniperStatus(it.itemID, 0, 0,
-                SniperTableModel.textFor(AuctionSniper.SniperSnapshot.SniperStatus.JOINING)
-            )
+    fun startBiddingInFor(itemId: String) {
+        when (itemId) {
+            "dish" -> {
+                itemIdField().clearText()
+                itemIdField().typeText(itemId[0].plus(itemId))
+            }
+
+            "tv" -> {
+                itemIdField().clearText()
+                itemIdField().typeText(itemId)
+            }
+        }
+//        itemIdField().replaceAllText((itemId))
+        bidButton().click()
+    }
+
+    private fun itemIdField(): JTextFieldDriver {
+        return JTextFieldDriver(this, JTextField::class.java, named(ITEM_ID_FIELD)).apply {
+            focusWithMouse()
         }
     }
+
+    private fun bidButton() = JButtonDriver(this, JButton::class.java, named(BID_BUTTON))
 
 }

@@ -12,26 +12,20 @@ import org.jivesoftware.smack.XMPPConnection
 import org.jivesoftware.smack.packet.Message
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.TimeUnit.SECONDS
-interface ItemID{
-    fun itemID(): String
-}
 
-const val HOST_NAME = "localhost"
-const val AUCTION_PASSWORD = "auction"
-const val ITEM_ID_AS_LOGING = "auction-%s"
-const val AUCTION_RESOURCE = "Auction"
-
-class FakeAuctionServer(val itemID: String): ItemID {
+class NewAuctionServer(private val itemID: String): ItemID {
     private val messageListener = SingleMessageListener()
     private var chat: Chat? = null
 
     private val connection = XMPPConnection(ConnectionConfiguration(HOST_NAME, 5224))
-
+    override fun itemID(): String {
+        return itemID
+    }
     fun startSellingItem() {
         connection.connect()
-        connection.login(String.format(ITEM_ID_AS_LOGING, itemID), AUCTION_PASSWORD, AUCTION_RESOURCE)
+        connection.login(itemID, AUCTION_PASSWORD, AUCTION_RESOURCE)
         connection.chatManager.addChatListener { chat, createdLocally ->
-            this@FakeAuctionServer.chat = chat
+            this@NewAuctionServer.chat = chat
             chat.addMessageListener(messageListener)
         }
     }
@@ -73,9 +67,5 @@ class FakeAuctionServer(val itemID: String): ItemID {
             messageQueue.add(message)
         }
 
-    }
-
-    override fun itemID(): String {
-        return itemID
     }
 }

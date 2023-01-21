@@ -7,31 +7,23 @@ const val ARG_HOST_NAME = 0
 const val ARG_PORT = 1
 val ARG_USER_NAME = 2
 val ARG_PASSWORD = 3
-val ARG_ITEM_ID = 4
 
 val AUCTION_RESOURCE = "Auction"
-val ITEM_ID_AS_LOGIN = "auction-%s"
+val ITEM_ID_AS_LOGIN = "%s"
 val AUCTION_ID_FORMAT = "$ITEM_ID_AS_LOGIN@%s/$AUCTION_RESOURCE"
 object MainRun {
-
     const val JOIN_COMMAND_FORMAT: String = "SOLVersion: 1.1; Command: JOIN;"
     const val BID_FORMAT = "SOLVersion: 1.1; EVENT: BID; PRICE: %s;"
 }
 fun main(args: Array<String>) {
-    val main = Main()
     val connection = connection(args[ARG_HOST_NAME], args[ARG_PORT], args[ARG_USER_NAME], args[ARG_PASSWORD])
-    (ARG_ITEM_ID..args.lastIndex).forEach {
-        main.joinAuction(connection, args[it])
-    }
+    val main = Main(connection)
 }
 
 private fun connection(hostname: String, port: String, userName: String, password: String): XMPPConnection {
-    val connectionConfiguration = ConnectionConfiguration(hostname, port.toInt()).apply {
-    }
+    val connectionConfiguration = ConnectionConfiguration(hostname, port.toInt())
     return XMPPConnection(connectionConfiguration).apply {
-
         connect()
-
         login(userName, password, AUCTION_RESOURCE)
     }
 }

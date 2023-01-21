@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test
 
 class AuctionSniperEndToEndTest {
 
-    private val auction = FakeAuctionServer("item-54321")
-    private val auction2 = FakeAuctionServer("item-65432")
+    private val auction = NewAuctionServer("dish")
+    private val auction2 = NewAuctionServer("tv")
     private val application = ApplicationRunner()
 
     @Test

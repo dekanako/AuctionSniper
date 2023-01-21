@@ -8,46 +8,48 @@ import kotlin.concurrent.thread
 
 class ApplicationRunner {
     private val driver = AuctionSniperDriver(1000)
-    fun startBiddingIn(vararg auctions: FakeAuctionServer) {
-        thread(isDaemon = true, name = "Test Application") {
-            main(args = arguments(auctions))
+    fun startBiddingIn(vararg auctions: ItemID) {
+        startSniper()
+        auctions.forEach { itemId ->
+            driver.startBiddingInFor(itemId.itemID())
+            driver.showsSniperStatus(itemId.itemID(), 0, 0, textFor(JOINING))
         }
-        assertBasicWindow(auctions)
-    }
-
-    private fun assertBasicWindow(auctions: Array<out FakeAuctionServer>) {
         driver.hasTitle(APPLICATION_TITLE)
         driver.hasColumnTitles()
-        driver.showsSniperJoiningAuctions(auctions)
     }
 
-    private fun arguments(auctions: Array<out FakeAuctionServer>): Array<String> {
+    private fun startSniper() {
+        thread(isDaemon = true, name = "Test Application") {
+            main(args = arguments())
+        }
+    }
+
+
+
+    private fun arguments(): Array<String> {
         val args = mutableListOf<String>()
         args.add(HOST_NAME)
         args.add("5224")
         args.add("sniper")
         args.add("sniper")
-        auctions.forEach {
-            args.add(it.itemID)
-        }
         return args.toTypedArray()
     }
 
-    fun showsSniperHasLostAuction(auction: FakeAuctionServer, lastPrice: Int, bid: Int) {
-        driver.showsSniperStatus(auction.itemID, lastPrice, bid, textFor(LOST))
+    fun showsSniperHasLostAuction(auction: ItemID, lastPrice: Int, bid: Int) {
+        driver.showsSniperStatus(auction.itemID(), lastPrice, bid, textFor(LOST))
     }
 
-    fun hasShownSniperIsBidding(auction: FakeAuctionServer, lastPrice: Int, lastBid: Int) {
+    fun hasShownSniperIsBidding(auction: ItemID, lastPrice: Int, lastBid: Int) {
 
-        driver.showsSniperStatus(auction.itemID, lastPrice, lastBid, textFor(BIDDING))
+        driver.showsSniperStatus(auction.itemID(), lastPrice, lastBid, textFor(BIDDING))
     }
 
-    fun hasShownSniperIsWinning(auction: FakeAuctionServer, winningBid: Int) {
-        driver.showsSniperStatus(auction.itemID, winningBid, winningBid, textFor(WINNING))
+    fun hasShownSniperIsWinning(auction: ItemID, winningBid: Int) {
+        driver.showsSniperStatus(auction.itemID(), winningBid, winningBid, textFor(WINNING))
     }
 
-    fun showsSniperHasWonAuction(auction: FakeAuctionServer, lastPrice: Int) {
-        driver.showsSniperStatus(auction.itemID, lastPrice, lastPrice, textFor(WON))
+    fun showsSniperHasWonAuction(auction: ItemID, lastPrice: Int) {
+        driver.showsSniperStatus(auction.itemID(), lastPrice, lastPrice, textFor(WON))
     }
 
     fun stop() {

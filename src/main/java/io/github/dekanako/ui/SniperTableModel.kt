@@ -24,7 +24,7 @@ class SniperTableModel : AbstractTableModel() {
         val index = snapshot.indexOfFirst { it.isForSameItemAs(sniperSnapshot) }
         throwIfItemWasntAddedBefore(index, sniperSnapshot)
         snapshot[index] = sniperSnapshot
-        fireTableRowsUpdated(index, index + 1)
+        fireTableDataChanged()
     }
 
     private fun throwIfItemWasntAddedBefore(index: Int, sniperSnapshot: SniperSnapshot) {
@@ -33,7 +33,7 @@ class SniperTableModel : AbstractTableModel() {
 
     fun addSniper(newSnapshot: SniperSnapshot) {
         snapshot.add(newSnapshot)
-        fireTableRowsInserted(snapshot.lastIndex - 1, snapshot.lastIndex)
+        fireTableDataChanged()
     }
 
     companion object {
