@@ -1,5 +1,6 @@
 package io.github.dekanako.ui
 
+import io.github.dekanako.AuctionHouse
 import io.github.dekanako.domain.AuctionSniper
 import io.github.dekanako.ui.SniperTableModel.Companion.textFor
 import java.awt.BorderLayout
@@ -24,9 +25,9 @@ interface UserRequestListener {
     fun joinAuction(itemID: String)
 }
 
-class MainWindow(private val snipers: SniperTableModel, private val listener: UserRequestListener) :
+class MainWindow(private val snipers: SniperTableModel) :
     JFrame(APPLICATION_TITLE) {
-
+    private var listener: UserRequestListener? = null
     init {
         name = MAIN_WINDOW_NAME
         fillContentPane(makeSnipersTable(), makeControls())
@@ -45,7 +46,7 @@ class MainWindow(private val snipers: SniperTableModel, private val listener: Us
         val bidButton = JButton("Join Auction").apply {
             name = BID_BUTTON
             addActionListener {
-                listener.joinAuction(itemField.text)
+                listener?.joinAuction(itemField.text)
             }
         }
 
@@ -67,6 +68,10 @@ class MainWindow(private val snipers: SniperTableModel, private val listener: Us
 
     private fun makeSnipersTable() = JTable(snipers).apply {
         name = SNIPERS_TABLE_NAME
+    }
+
+    fun addUserRequestListener(listener: UserRequestListener) {
+        this.listener = listener
     }
 
     enum class Column(val displayName: String) {

@@ -23,7 +23,8 @@ class MainWindowTest {
             }
         }
 
-        MainWindow(SniperTableModel(), listener)
+        val window = MainWindow(SniperTableModel())
+        window.addUserRequestListener(listener)
 
         driver.startBiddingInFor("dish")
 

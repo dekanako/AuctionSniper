@@ -4,18 +4,14 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.SwingUtilities
 
-import org.jivesoftware.smack.XMPPConnection
-
 import io.github.dekanako.ui.MainWindow
 import io.github.dekanako.ui.SniperTableModel
 import io.github.dekanako.ui.UserRequestListener
 
-import io.github.dekanako.xmpp.XMPPAuction
-
 import io.github.dekanako.domain.*
 import io.github.dekanako.domain.AuctionSniper.SniperSnapshot
 
-class Main(private val connection: XMPPConnection) : UserRequestListener {
+class Main  {
     private lateinit var ui: MainWindow
     private val snipers = SniperTableModel()
 
@@ -28,28 +24,29 @@ class Main(private val connection: XMPPConnection) : UserRequestListener {
 
     private fun startUserInterface() {
         SwingUtilities.invokeAndWait {
-            ui = MainWindow(snipers, this)
+            ui = MainWindow(snipers)
         }
     }
 
-    override fun joinAuction(itemID: String) {
-        disconnectWhenUIClose(connection)
-
-        snipers.addSniper(SniperSnapshot.joining(itemID))
-
-        val auction = XMPPAuction(connection, itemID)
-
-        notToBeGCD.add(auction)
-
-        auction.addAuctionEventListener(AuctionSniper(itemID, auction, SwingThreadSniperListener()))
-        auction.join()
-    }
-
-    private fun disconnectWhenUIClose(connection: XMPPConnection) {
+    fun disconnectWhenUIClose(auctionHouse: AuctionHouse) {
         ui.addWindowListener(object : WindowAdapter() {
             override fun windowClosed(e: WindowEvent?) {
-                connection.disconnect()
+                auctionHouse.disconnect()
             }
+        })
+    }
+
+    fun addUserRequestListenerFor(auctionHouse: AuctionHouse) {
+        ui.addUserRequestListener(object : UserRequestListener {
+            override fun joinAuction(itemID: String) {
+                snipers.addSniper(SniperSnapshot.joining(itemID))
+
+                val auction = auctionHouse.auctionFor(itemID)
+                notToBeGCD.add(auction)
+                auction.addAuctionEventListener(AuctionSniper(itemID, auction, SwingThreadSniperListener()))
+                auction.join()
+            }
+
         })
     }
 
@@ -60,6 +57,5 @@ class Main(private val connection: XMPPConnection) : UserRequestListener {
             }
         }
     }
-
 
 }

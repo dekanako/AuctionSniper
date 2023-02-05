@@ -1,6 +1,8 @@
 package e2e
 
 import io.github.dekanako.MainRun
+import io.github.dekanako.xmpp.BID_FORMAT
+import io.github.dekanako.xmpp.JOIN_COMMAND_FORMAT
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Matcher
 import org.hamcrest.MatcherAssert.assertThat
@@ -31,10 +33,10 @@ class NewAuctionServer(private val itemID: String): ItemID {
     }
 
     fun hasReceivedJoinRequestFromSniper(sniperId: String) {
-        receivesAMessageMatching(sniperId, equalTo(MainRun.JOIN_COMMAND_FORMAT))
+        receivesAMessageMatching(sniperId, equalTo(JOIN_COMMAND_FORMAT))
     }
     fun hasReceivedBid(bid: Int, sniperId: String) {
-        receivesAMessageMatching(sniperId, equalTo(MainRun.BID_FORMAT.format(bid)))
+        receivesAMessageMatching(sniperId, equalTo(BID_FORMAT.format(bid)))
     }
     fun announceClosed() {
         chat?.sendMessage("SOLVersion: 1.1; Event: CLOSE;")
