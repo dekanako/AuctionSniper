@@ -1,0 +1,7 @@
+package integration
+
+
+class XMPPAuctionIntegrationTest {
+
+
+}

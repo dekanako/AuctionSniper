@@ -1,4 +1,4 @@
-package io.github.dekanako.infraRemote
+package io.github.dekanako.xmpp
 
 import io.github.dekanako.domain.AuctionEventListener
 import io.github.dekanako.domain.AuctionEventListener.PriceSource
