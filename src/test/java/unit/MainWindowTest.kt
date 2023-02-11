@@ -17,13 +17,11 @@ class MainWindowTest {
     fun makesUserRequestWhenJoinButtonClicked() {
         val buttonProbe = ValueMatcherProbe(Matchers.equalTo("dish"), "join request")
 
-        val listener: UserRequestListener = object : UserRequestListener {
-            override fun joinAuction(itemID: String) {
-                buttonProbe.setReceivedValue(itemID)
-            }
-        }
+        val listener = UserRequestListener { itemID -> buttonProbe.setReceivedValue(itemID) }
 
-        MainWindow(SniperTableModel(), listener)
+        MainWindow(SniperTableModel()).apply {
+            addUserRequestListener(listener)
+        }
 
         driver.startBiddingInFor("dish")
 

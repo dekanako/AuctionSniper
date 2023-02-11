@@ -1,6 +1,7 @@
 package e2e
 
-import io.github.dekanako.MainRun
+import io.github.dekanako.xmpp.BID_FORMAT
+import io.github.dekanako.xmpp.JOIN_COMMAND_FORMAT
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Matcher
 import org.hamcrest.MatcherAssert.assertThat
@@ -12,6 +13,11 @@ import org.jivesoftware.smack.XMPPConnection
 import org.jivesoftware.smack.packet.Message
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.TimeUnit.SECONDS
+
+const val HOST_NAME = "localhost"
+const val AUCTION_PASSWORD = "auction"
+const val ITEM_ID_AS_LOGING = "auction-%s"
+const val AUCTION_RESOURCE = "Auction"
 
 class NewAuctionServer(private val itemID: String): ItemID {
     private val messageListener = SingleMessageListener()
@@ -31,10 +37,10 @@ class NewAuctionServer(private val itemID: String): ItemID {
     }
 
     fun hasReceivedJoinRequestFromSniper(sniperId: String) {
-        receivesAMessageMatching(sniperId, equalTo(MainRun.JOIN_COMMAND_FORMAT))
+        receivesAMessageMatching(sniperId, equalTo(JOIN_COMMAND_FORMAT))
     }
     fun hasReceivedBid(bid: Int, sniperId: String) {
-        receivesAMessageMatching(sniperId, equalTo(MainRun.BID_FORMAT.format(bid)))
+        receivesAMessageMatching(sniperId, equalTo(BID_FORMAT.format(bid)))
     }
     fun announceClosed() {
         chat?.sendMessage("SOLVersion: 1.1; Event: CLOSE;")

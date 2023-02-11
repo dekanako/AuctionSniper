@@ -26,14 +26,7 @@ class ApplicationRunner {
 
 
 
-    private fun arguments(): Array<String> {
-        val args = mutableListOf<String>()
-        args.add(HOST_NAME)
-        args.add("5224")
-        args.add("sniper")
-        args.add("sniper")
-        return args.toTypedArray()
-    }
+
 
     fun showsSniperHasLostAuction(auction: ItemID, lastPrice: Int, bid: Int) {
         driver.showsSniperStatus(auction.itemID(), lastPrice, bid, textFor(LOST))
@@ -60,4 +53,13 @@ class ApplicationRunner {
         const val SNIPER_XMPP_ID: String = "sniper@localhost/Auction"
     }
 
+}
+
+fun arguments(): Array<String> {
+    val args = mutableListOf<String>()
+    args.add(HOST_NAME)
+    args.add("5224")
+    args.add("sniper")
+    args.add("sniper")
+    return args.toTypedArray()
 }

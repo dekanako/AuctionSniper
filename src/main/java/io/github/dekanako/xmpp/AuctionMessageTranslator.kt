@@ -1,4 +1,4 @@
-package io.github.dekanako.infraRemote
+package io.github.dekanako.xmpp
 
 import io.github.dekanako.domain.AuctionEventListener
 import io.github.dekanako.domain.AuctionEventListener.PriceSource
@@ -13,7 +13,8 @@ private const val EVENT = "Event"
 private const val CURRENT_PRICE = "CurrentPrice"
 private const val INCREMENT = "Increment"
 
-class AuctionMessageTranslator(private val sniperId: String, private val eventListener: AuctionEventListener) : MessageListener {
+class AuctionMessageTranslator(private val sniperId: String, private val eventListener: AuctionEventListener) :
+    MessageListener {
 
     override fun processMessage(chat: Chat?, message: Message?) {
         val event = AuctionEvent(message)
@@ -24,6 +25,7 @@ class AuctionMessageTranslator(private val sniperId: String, private val eventLi
     }
 
 }
+
 private class AuctionEvent(message: Message?) {
     private val fields = unpackEventFrom(message);
     fun currentPrice() = getInt(CURRENT_PRICE)

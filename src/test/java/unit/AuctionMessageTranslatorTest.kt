@@ -2,7 +2,7 @@ package unit
 
 import io.github.dekanako.domain.AuctionEventListener
 import io.github.dekanako.domain.AuctionEventListener.PriceSource
-import io.github.dekanako.infraRemote.AuctionMessageTranslator
+import io.github.dekanako.xmpp.AuctionMessageTranslator
 import io.mockk.mockk
 import io.mockk.verify
 import org.jivesoftware.smack.packet.Message
