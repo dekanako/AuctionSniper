@@ -23,7 +23,7 @@ class MainWindowTest {
             }
         }
 
-        MainWindow(SniperTableModel()).apply {
+        MainWindow(mockk(relaxed = true)).apply {
             addUserRequestListener(listener)
         }
 

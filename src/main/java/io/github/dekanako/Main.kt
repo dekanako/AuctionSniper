@@ -1,7 +1,6 @@
 package io.github.dekanako
 
 import io.github.dekanako.ui.MainWindow
-import io.github.dekanako.ui.SniperTableModel
 
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -10,19 +9,19 @@ import javax.swing.SwingUtilities
 class Main {
     private lateinit var ui: MainWindow
 
-    private val snipers = SniperTableModel()
+    private val portfolio = SniperPortfolio()
     init {
         startUserInterface()
     }
 
     private fun startUserInterface() {
         SwingUtilities.invokeAndWait {
-            ui = MainWindow(snipers)
+            ui = MainWindow(portfolio)
         }
     }
 
     fun addUserRequestListenerFor(auctionHouse: AuctionHouse) {
-        ui.addUserRequestListener(SniperLauncher(auctionHouse, snipers))
+        ui.addUserRequestListener(SniperLauncher(auctionHouse, portfolio))
     }
 
     fun disconnectWhenUIClose(auctionHouse: AuctionHouse) {

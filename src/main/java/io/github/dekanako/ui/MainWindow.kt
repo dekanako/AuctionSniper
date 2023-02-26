@@ -1,11 +1,13 @@
 package io.github.dekanako.ui
 
+import io.github.dekanako.SniperPortfolio
 import io.github.dekanako.domain.AuctionSniper
 import io.github.dekanako.ui.SniperTableModel.Companion.textFor
 import java.awt.BorderLayout
 import java.awt.BorderLayout.CENTER
 import java.awt.BorderLayout.NORTH
 import java.awt.FlowLayout
+import java.util.EventListener
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JPanel
@@ -23,8 +25,11 @@ const val APPLICATION_TITLE = "Auction Sniper"
 interface UserRequestListener {
     fun joinAuction(itemID: String)
 }
+interface PortfolioListener: EventListener {
+    fun sniperAdded(sniper: AuctionSniper)
+}
 
-class MainWindow(private val snipers: SniperTableModel) :
+class MainWindow(private val portfolio: SniperPortfolio) :
     JFrame(APPLICATION_TITLE) {
 
     private var listener: UserRequestListener? = null
@@ -67,8 +72,13 @@ class MainWindow(private val snipers: SniperTableModel) :
         }
     }
 
-    private fun makeSnipersTable() = JTable(snipers).apply {
-        name = SNIPERS_TABLE_NAME
+    private fun makeSnipersTable(): JTable {
+        val snipers = SniperTableModel()
+
+        portfolio.addPortfolioListener(snipers)
+        return JTable(snipers).apply {
+            name = SNIPERS_TABLE_NAME
+        }
     }
 
     fun addUserRequestListener(listener: UserRequestListener) {

@@ -9,7 +9,7 @@ import io.github.dekanako.domain.AuctionSniper.SniperSnapshot
 
 import javax.swing.table.AbstractTableModel
 
-class SniperTableModel : AbstractTableModel(), SniperCollector {
+class SniperTableModel : AbstractTableModel(), PortfolioListener {
 
     @Suppress("Not to be GCD")
     private var notToBeGCD: MutableList<AuctionSniper> = mutableListOf()
@@ -41,12 +41,10 @@ class SniperTableModel : AbstractTableModel(), SniperCollector {
         if (index == -1) throw FoolishError("$sniperSnapshot Should be added before updating it")
     }
 
-    override fun addSniper(sniper: AuctionSniper) {
-        notToBeGCD.add(sniper)
+    override fun sniperAdded(sniper: AuctionSniper) {
         addSniperSnapshot(sniper.snapshot)
         sniper.addSniperListener(SwingThreadSniperListener(this))
     }
-
     fun addSniperSnapshot(newSnapshot: SniperSnapshot) {
         snapshots.add(newSnapshot)
         fireTableDataChanged()
@@ -61,6 +59,5 @@ class SniperTableModel : AbstractTableModel(), SniperCollector {
         private val STATUS_TEXTS =
             arrayOf("JOINING", "BIDDING", "WINNING", "LOST", "WON")
     }
-
 
 }
