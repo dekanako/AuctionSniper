@@ -1,8 +1,5 @@
 package io.github.dekanako
 
-import io.github.dekanako.domain.*
-import io.github.dekanako.domain.AuctionSniper.SniperSnapshot
-
 import io.github.dekanako.ui.MainWindow
 import io.github.dekanako.ui.SniperTableModel
 
@@ -12,11 +9,8 @@ import javax.swing.SwingUtilities
 
 class Main {
     private lateinit var ui: MainWindow
+
     private val snipers = SniperTableModel()
-
-    @Suppress("Not to be GCD")
-    private var notToBeGCD: MutableList<Auction> = mutableListOf()
-
     init {
         startUserInterface()
     }
@@ -28,15 +22,7 @@ class Main {
     }
 
     fun addUserRequestListenerFor(auctionHouse: AuctionHouse) {
-        ui.addUserRequestListener { itemID ->
-            snipers.addSniper(SniperSnapshot.joining(itemID))
-            val auction = auctionHouse.auctionFor(itemID)
-            notToBeGCD.add(auction)
-            auction.addAuctionEventListener(
-                AuctionSniper(itemID, auction, SwingThreadSniperListener())
-            )
-            auction.join()
-        }
+        ui.addUserRequestListener(SniperLauncher(auctionHouse, snipers))
     }
 
     fun disconnectWhenUIClose(auctionHouse: AuctionHouse) {
@@ -46,12 +32,5 @@ class Main {
             }
         })
     }
-
-    private inner class SwingThreadSniperListener : SniperListener {
-        override fun sniperStateChanged(sniperSnapshot: SniperSnapshot) {
-            SwingUtilities.invokeLater {
-                snipers.sniperStatusChanged(sniperSnapshot)
-            }
-        }
-    }
 }
+

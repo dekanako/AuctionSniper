@@ -17,7 +17,11 @@ class MainWindowTest {
     fun makesUserRequestWhenJoinButtonClicked() {
         val buttonProbe = ValueMatcherProbe(Matchers.equalTo("dish"), "join request")
 
-        val listener = UserRequestListener { itemID -> buttonProbe.setReceivedValue(itemID) }
+        val listener = object : UserRequestListener {
+            override fun joinAuction(itemID: String) {
+                buttonProbe.setReceivedValue(itemID)
+            }
+        }
 
         MainWindow(SniperTableModel()).apply {
             addUserRequestListener(listener)

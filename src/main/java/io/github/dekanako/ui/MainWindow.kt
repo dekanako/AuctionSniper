@@ -20,7 +20,7 @@ const val SNIPERS_TABLE_NAME = "snipers table"
 
 const val APPLICATION_TITLE = "Auction Sniper"
 
-fun interface UserRequestListener {
+interface UserRequestListener {
     fun joinAuction(itemID: String)
 }
 

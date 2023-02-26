@@ -32,7 +32,7 @@ class AuctionSniperEndToEndTest {
 
         auction.reportPrice(10, 10, "other bidder")
 
-        application.hasShownSniperIsBidding(auction,10,20)
+        application.hasShownSniperIsBidding(auction, 10, 20)
         auction.hasReceivedBid(20, SNIPER_XMPP_ID)
 
         auction.announceClosed()
@@ -76,15 +76,14 @@ class AuctionSniperEndToEndTest {
         auction2.reportPrice(500, 21, "Other Bidder")
         auction2.hasReceivedBid(521, SNIPER_XMPP_ID)
 
-        application.hasShownSniperIsBidding(auction,1000, 1098)
-        application.hasShownSniperIsBidding(auction2,500, 521)
+        application.hasShownSniperIsBidding(auction, 1000, 1098)
+        application.hasShownSniperIsBidding(auction2, 500, 521)
 
         auction.reportPrice(1098, 97, SNIPER_XMPP_ID)
         application.hasShownSniperIsWinning(auction, 1098)
 
         auction2.reportPrice(521, 22, SNIPER_XMPP_ID)
         application.hasShownSniperIsWinning(auction2, 521)
-
 
         auction.announceClosed()
         application.showsSniperHasWonAuction(auction, 1098)

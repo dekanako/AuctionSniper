@@ -8,6 +8,7 @@ import io.mockk.MockKVerificationScope
 import io.mockk.Ordering.SEQUENCE
 import io.mockk.mockk
 import io.mockk.verify
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 const val ITEM_ID = "item-323"
@@ -16,8 +17,11 @@ class AuctionSniperTest {
     private val auction = mockk<Auction>(relaxed = true)
     private val sniperListenerSpy = mockk<SniperListener>(relaxed = true)
 
-    private val sniper = AuctionSniper(ITEM_ID, auction, sniperListenerSpy)
-
+    private val sniper = AuctionSniper(ITEM_ID, auction)
+    @BeforeEach
+    fun setup() {
+        sniper.addSniperListener(sniperListenerSpy)
+    }
     @Test
     fun reportLostWhenAuctionClosesImmediately() {
         sniper.closed()

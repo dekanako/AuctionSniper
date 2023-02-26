@@ -1,29 +1,39 @@
 package io.github.dekanako.ui
 
 import io.github.dekanako.FoolishError
+import io.github.dekanako.SniperCollector
+import io.github.dekanako.SwingThreadSniperListener
+
+import io.github.dekanako.domain.AuctionSniper
 import io.github.dekanako.domain.AuctionSniper.SniperSnapshot
+
 import javax.swing.table.AbstractTableModel
 
-class SniperTableModel : AbstractTableModel() {
-    private var snapshot: MutableList<SniperSnapshot> = mutableListOf()
+class SniperTableModel : AbstractTableModel(), SniperCollector {
+
+    @Suppress("Not to be GCD")
+    private var notToBeGCD: MutableList<AuctionSniper> = mutableListOf()
+
+    private var snapshots: MutableList<SniperSnapshot> = mutableListOf()
     override fun getRowCount(): Int {
-        return snapshot.size
+        return snapshots.size
     }
 
     override fun getColumnCount() = MainWindow.Column.values().size
     override fun getColumnName(column: Int): String {
         return MainWindow.Column.at(column).displayName
     }
+
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any {
-        return if (snapshot.isEmpty()) ""
+        return if (snapshots.isEmpty()) ""
         else
-            MainWindow.Column.at(columnIndex).valueIn(snapshot[rowIndex])
+            MainWindow.Column.at(columnIndex).valueIn(snapshots[rowIndex])
     }
 
     fun sniperStatusChanged(sniperSnapshot: SniperSnapshot) {
-        val index = snapshot.indexOfFirst { it.isForSameItemAs(sniperSnapshot) }
+        val index = snapshots.indexOfFirst { it.isForSameItemAs(sniperSnapshot) }
         throwIfItemWasntAddedBefore(index, sniperSnapshot)
-        snapshot[index] = sniperSnapshot
+        snapshots[index] = sniperSnapshot
         fireTableDataChanged()
     }
 
@@ -31,12 +41,19 @@ class SniperTableModel : AbstractTableModel() {
         if (index == -1) throw FoolishError("$sniperSnapshot Should be added before updating it")
     }
 
-    fun addSniper(newSnapshot: SniperSnapshot) {
-        snapshot.add(newSnapshot)
+    override fun addSniper(sniper: AuctionSniper) {
+        notToBeGCD.add(sniper)
+        addSniperSnapshot(sniper.snapshot)
+        sniper.addSniperListener(SwingThreadSniperListener(this))
+    }
+
+    fun addSniperSnapshot(newSnapshot: SniperSnapshot) {
+        snapshots.add(newSnapshot)
         fireTableDataChanged()
     }
 
     companion object {
+
         fun textFor(state: SniperSnapshot.SniperStatus): String {
             return STATUS_TEXTS[state.ordinal]
         }
@@ -44,5 +61,6 @@ class SniperTableModel : AbstractTableModel() {
         private val STATUS_TEXTS =
             arrayOf("JOINING", "BIDDING", "WINNING", "LOST", "WON")
     }
+
 
 }

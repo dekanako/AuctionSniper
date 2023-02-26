@@ -4,31 +4,37 @@ import io.github.dekanako.domain.AuctionEventListener.PriceSource.FromSniper
 import io.github.dekanako.domain.AuctionSniper.SniperSnapshot.SniperStatus.*
 
 class AuctionSniper(
-    private val itemId: String,
+    itemId: String,
     private val auction: Auction,
-    private val sniperListener: SniperListener,
 ) : AuctionEventListener {
 
-    private var sniperSnapshot: SniperSnapshot = SniperSnapshot.joining(itemId)
-        set(value) {
+    private var sniperListener: SniperListener? = null
+
+    var snapshot: SniperSnapshot = SniperSnapshot.joining(itemId)
+        private set(value) {
             field = value
-            sniperListener.sniperStateChanged(field)
+            sniperListener?.sniperStateChanged(field)
         }
+
     override fun closed() {
-        changeSnapshotTo(sniperSnapshot.closed())
+        changeSnapshotTo(snapshot.closed())
     }
 
     override fun currentPrice(price: Int, increment: Int, source: AuctionEventListener.PriceSource) {
         if (source == FromSniper) {
-            changeSnapshotTo(sniperSnapshot.winning(price))
+            changeSnapshotTo(snapshot.winning(price))
         } else {
             val bid = price.plus(increment)
             auction.bid(bid)
-            changeSnapshotTo(sniperSnapshot.bidding(price, bid))
+            changeSnapshotTo(snapshot.bidding(price, bid))
         }
     }
     private fun changeSnapshotTo(newSnapshot: SniperSnapshot) {
-        sniperSnapshot = newSnapshot
+        snapshot = newSnapshot
+    }
+
+    fun addSniperListener(sniperListener: SniperListener) {
+        this.sniperListener = sniperListener
     }
 
     data class SniperSnapshot(val itemId: String, val price: Int, val bid: Int, val state: SniperStatus) {
